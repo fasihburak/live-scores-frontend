@@ -96,6 +96,7 @@ function Event({ event }) {
   let Icon; 
   let person = event.person;
   header = capitalizeFirstLetter(event.event_type);
+  // console.log('Event', event);
   const person_fullname = 
   `
   ${person.given_name} 
@@ -104,7 +105,6 @@ function Event({ event }) {
   `;
   if (header === 'Card') {
     const color = capitalizeFirstLetter(event.color);
-    console.log('COLOR', color);
     header = `${color} Card`;
     Icon = CardIcon;
   }
@@ -142,6 +142,7 @@ function Events({ matchId }) {
     const fetchAllEvents = async (url) => {
       let eventsAccumulator = [];
       while (url) {
+        console.log('Fetching the events:', url);
         const res = await fetch(url);
         if (!res.ok) {
           throw new Error("Network response was not ok");
@@ -173,13 +174,16 @@ function Events({ matchId }) {
 
     socket.onmessage = (message) => {
       const updatedEvent = JSON.parse(message.data);
+      console.log('Type of updatedEvent:', typeof updatedEvent);
+      console.log('Keys', Object.keys(updatedEvent));
       console.log('Updated event:', updatedEvent);
+      console.log('Message type', updatedEvent.message_type);
 
-      // // Update only the corresponding event in the dictionary
-      // setEvents((prevEvents) => ({
-      //   ...prevEvents,
-      //   [updatedEvent.id]: updatedEvent,
-      // }));
+      // Update only the corresponding event in the dictionary
+      setEvents((prevEvents) => ({
+        ...prevEvents,
+        [updatedEvent.id]: updatedEvent,
+      }));
     };
 
     socket.onerror = (err) => {
@@ -196,7 +200,6 @@ function Events({ matchId }) {
     };
   }, [matchId]);
 
-  console.log('DICT',events);
   
   if (error) return <div>Error: {error.message}</div>;
   if (Object.keys(events).length === 0) return <div>Loading events...</div>;
@@ -219,7 +222,7 @@ export default function Match({ matchId = '7b64e253-7dec-4eac-aa2f-5db89f58ecf8'
 
   useEffect(() => {
     const url = `${baseUrl}/api/matches/${matchId}/`; // trailing slash added here
-    console.log("Fetching:", url);
+    console.log("Fetching the match:", url);
     fetch(url)
       .then(res => {
         if (!res.ok) {
