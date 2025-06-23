@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import LikeButton from './like-button';
-import { baseUrl } from '../config';
+import { useParams } from 'next/navigation';
+import LikeButton from '../../like-button';
+import { baseUrl } from '../../../config';
 
 function Header({ title }) {
   return <h1>{title ? title : 'Default title'}</h1>;
@@ -165,7 +166,8 @@ function Events({ eventsDict }) {
   );
 }
 
-export default function Match({ matchId = '7b64e253-7dec-4eac-aa2f-5db89f58ecf8' } = {}) {
+export default function Match() {
+  const { matchId } = useParams();
   const [matchData, setMatchData] = useState(null);
   const [events, setEvents] = useState({});
   const [error, setError] = useState(null);
