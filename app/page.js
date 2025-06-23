@@ -134,11 +134,42 @@ function Event({ event }) {
   )
 }
 
-function Events({ matchId }) {
+function Events({ eventsDict }) {
+  if (Object.keys(eventsDict).length === 0) return <div>Loading events...</div>;
+
+  return ( 
+    <ul>
+      {Object.keys(eventsDict).map(key => (
+        <li key={key} className='in-match-event'>
+          {/* Render the event details. Adjust Event component to accept event prop */}
+          <Event event={eventsDict[key]} />
+        </li>
+      ))}
+    </ul> 
+  );
+}
+
+export default function Match({ matchId = '7b64e253-7dec-4eac-aa2f-5db89f58ecf8' } = {}) {
+  const [matchData, setMatchData] = useState(null);
   const [events, setEvents] = useState({});
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    const url = `${baseUrl}/api/matches/${matchId}/`; // trailing slash added here
+    console.log("Fetching the match:", url);
+    fetch(url)
+      .then(res => {
+        if (!res.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return res.json();
+      })
+      .then(data => setMatchData(data))
+      .catch(err => {
+        console.error("Fetch error:", err);
+        setError(err);
+      });
+
     const fetchAllEvents = async (url) => {
       let eventsAccumulator = [];
       while (url) {
@@ -169,8 +200,11 @@ function Events({ matchId }) {
         setError(err);
       });
 
+
     // Establish WebSocket connection
     const socket = new WebSocket(`ws://localhost:8000/ws/chat/${matchId}/`);
+
+
 
     socket.onmessage = (message) => {
       const incomingEvent = JSON.parse(message.data);
@@ -219,44 +253,12 @@ function Events({ matchId }) {
     return () => {
       socket.close();
     };
+
+
+
+
   }, [matchId]);
 
-  
-  if (error) return <div>Error: {error.message}</div>;
-  if (Object.keys(events).length === 0) return <div>Loading events...</div>;
-
-  return ( 
-    <ul>
-      {Object.keys(events).map(key => (
-        <li key={key} className='in-match-event'>
-          {/* Render the event details. Adjust Event component to accept event prop */}
-          <Event event={events[key]} />
-        </li>
-      ))}
-    </ul> 
-  );
-}
-
-export default function Match({ matchId = '7b64e253-7dec-4eac-aa2f-5db89f58ecf8' } = {}) {
-  const [matchData, setMatchData] = useState(null);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const url = `${baseUrl}/api/matches/${matchId}/`; // trailing slash added here
-    console.log("Fetching the match:", url);
-    fetch(url)
-      .then(res => {
-        if (!res.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return res.json();
-      })
-      .then(data => setMatchData(data))
-      .catch(err => {
-        console.error("Fetch error:", err);
-        setError(err);
-      });
-  }, [matchId]);
 
   if (error) return <div>Error: {error.message}</div>;
   if (!matchData) return <div>Loading...</div>;
@@ -267,7 +269,7 @@ export default function Match({ matchId = '7b64e253-7dec-4eac-aa2f-5db89f58ecf8'
         <Header title={matchData.id} />
         <Score matchData={matchData} />
         {/* <LikeButton matchId={matchId} /> */}
-        <Events matchId={matchId} />
+        <Events eventsDict={events} />
       </div>
     </div>
     );
