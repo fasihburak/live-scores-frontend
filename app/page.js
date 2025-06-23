@@ -86,6 +86,22 @@ const SoccerBallIcon = () => (
   </svg>
 );
 
+// Fetch all events for a specific match using while loop
+const fetchAllEvents = async (eventsUrl) => {
+  let eventsAccumulator = [];
+  while (eventsUrl) {
+    console.log('Fetching the events:', eventsUrl);
+    const res = await fetch(eventsUrl);
+    if (!res.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const data = await res.json();
+    eventsAccumulator = eventsAccumulator.concat(data.results);
+    eventsUrl = data.next; // if data.next is not null, loop continues
+  }
+  return eventsAccumulator;
+};
+
 function capitalizeFirstLetter(str) {
   if (!str) return '';
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -155,9 +171,10 @@ export default function Match({ matchId = '7b64e253-7dec-4eac-aa2f-5db89f58ecf8'
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const url = `${baseUrl}/api/matches/${matchId}/`; // trailing slash added here
-    console.log("Fetching the match:", url);
-    fetch(url)
+    // Get match details
+    const matchUrl = `${baseUrl}/api/matches/${matchId}/`; // trailing slash added here
+    console.log("Fetching the match:", matchUrl);
+    fetch(matchUrl)
       .then(res => {
         if (!res.ok) {
           throw new Error("Network response was not ok");
@@ -169,24 +186,10 @@ export default function Match({ matchId = '7b64e253-7dec-4eac-aa2f-5db89f58ecf8'
         console.error("Fetch error:", err);
         setError(err);
       });
-
-    const fetchAllEvents = async (url) => {
-      let eventsAccumulator = [];
-      while (url) {
-        console.log('Fetching the events:', url);
-        const res = await fetch(url);
-        if (!res.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const data = await res.json();
-        eventsAccumulator = eventsAccumulator.concat(data.results);
-        url = data.next; // if data.next is not null, loop continues
-      }
-      return eventsAccumulator;
-    };
-
-    const initialUrl = `${baseUrl}/api/in-match-events/?match=${matchId}`;
-    fetchAllEvents(initialUrl)
+    
+    // Get events for the match
+    const initialEventsUrl = `${baseUrl}/api/in-match-events/?match=${matchId}`;
+    fetchAllEvents(initialEventsUrl)
       .then(eventsArray => {
         const eventsDict = eventsArray.reduce((acc, event) => {
           acc[event.id] = event;
@@ -204,40 +207,43 @@ export default function Match({ matchId = '7b64e253-7dec-4eac-aa2f-5db89f58ecf8'
     // Establish WebSocket connection
     const socket = new WebSocket(`ws://localhost:8000/ws/chat/${matchId}/`);
 
-
-
     socket.onmessage = (message) => {
-      const incomingEvent = JSON.parse(message.data);
-      console.log('Type of incomingEvent:', typeof incomingEvent);
-      console.log('Keys', Object.keys(incomingEvent));
-      console.log('Incoming event:', incomingEvent);
-      console.log('Message type', incomingEvent.message_type);
+      const messageDict = JSON.parse(message.data);
+      console.log('Type of incomingEvent:', typeof messageDict);
+      console.log('Keys', Object.keys(messageDict));
+      console.log('Incoming event:', messageDict);
+      console.log('Message type', messageDict.message_type);
 
-      if (incomingEvent.operation_type === 'delete') {
+      if (messageDict.message_type === 'match') {
+        setMatchData((prevData) => ({
+          ...prevData,
+          ...messageDict,
+        }));
+      } else if (messageDict.message_type === 'in_match_event') {
+        if (messageDict.operation_type === 'delete') {
           // Remove the event from the dictionary
           setEvents((prevEvents) => {
-              const { [incomingEvent.id]: _, ...otherEvents } = prevEvents;
+              const { [messageDict.id]: _, ...otherEvents } = prevEvents;
               return otherEvents;
           });
-      } 
-      else {
+        } else {
           // Update the corresponding event using destructuring
           setEvents((prevEvents) => {
-              const { [incomingEvent.id]: oldEvent, ...otherEvents } = prevEvents;
-              const newEvents = {
-                  ...otherEvents,
-                  [incomingEvent.id]: incomingEvent,
-              };
-              // Event may be updated with a new minute value, so that the events need to be sorted
-              // Convert to array, sort, and then convert back to a dictionary
-              const sortedEventsArray = Object.values(newEvents).sort((a, b) => b.minute - a.minute);
-              const sortedEventsDict = sortedEventsArray.reduce((acc, event) => {
-                  acc[event.id] = event;
-                  return acc;
-              }, {});
-
-              return sortedEventsDict;
+            const { [messageDict.id]: oldEvent, ...otherEvents } = prevEvents;
+            const newEvents = {
+              ...otherEvents,
+              [messageDict.id]: messageDict,
+            };
+            // Event may be updated with a new minute value, so that the events need to be sorted
+            // Convert to array, sort, and then convert back to a dictionary
+            const sortedEventsArray = Object.values(newEvents).sort((a, b) => b.minute - a.minute);
+            const sortedEventsDict = sortedEventsArray.reduce((acc, event) => {
+              acc[event.id] = event;
+              return acc;
+            }, {});
+            return sortedEventsDict;
           });
+        }
       }
     };
 
@@ -262,7 +268,7 @@ export default function Match({ matchId = '7b64e253-7dec-4eac-aa2f-5db89f58ecf8'
 
   if (error) return <div>Error: {error.message}</div>;
   if (!matchData) return <div>Loading...</div>;
-
+  // if (Object.keys(events).length === 0) return <div>Loading events...</div>;
   return (
     <div className='container'>
       <div id='match'>
