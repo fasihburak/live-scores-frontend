@@ -173,17 +173,38 @@ function Events({ matchId }) {
     const socket = new WebSocket(`ws://localhost:8000/ws/chat/${matchId}/`);
 
     socket.onmessage = (message) => {
-      const updatedEvent = JSON.parse(message.data);
-      console.log('Type of updatedEvent:', typeof updatedEvent);
-      console.log('Keys', Object.keys(updatedEvent));
-      console.log('Updated event:', updatedEvent);
-      console.log('Message type', updatedEvent.message_type);
+      const incomingEvent = JSON.parse(message.data);
+      console.log('Type of incomingEvent:', typeof incomingEvent);
+      console.log('Keys', Object.keys(incomingEvent));
+      console.log('Incoming event:', incomingEvent);
+      console.log('Message type', incomingEvent.message_type);
 
-      // Update only the corresponding event in the dictionary
-      setEvents((prevEvents) => ({
-        ...prevEvents,
-        [updatedEvent.id]: updatedEvent,
-      }));
+      if (incomingEvent.operation_type === 'delete') {
+          // Remove the event from the dictionary
+          setEvents((prevEvents) => {
+              const { [incomingEvent.id]: _, ...otherEvents } = prevEvents;
+              return otherEvents;
+          });
+      } 
+      else {
+          // Update the corresponding event using destructuring
+          setEvents((prevEvents) => {
+              const { [incomingEvent.id]: oldEvent, ...otherEvents } = prevEvents;
+              const newEvents = {
+                  ...otherEvents,
+                  [incomingEvent.id]: incomingEvent,
+              };
+              // Event may be updated with a new minute value, so that the events need to be sorted
+              // Convert to array, sort, and then convert back to a dictionary
+              const sortedEventsArray = Object.values(newEvents).sort((a, b) => b.minute - a.minute);
+              const sortedEventsDict = sortedEventsArray.reduce((acc, event) => {
+                  acc[event.id] = event;
+                  return acc;
+              }, {});
+
+              return sortedEventsDict;
+          });
+      }
     };
 
     socket.onerror = (err) => {
