@@ -1,4 +1,5 @@
 "use client";
+import LiveIndicator from "./LiveIndicator";
 
 export default function ClientMatchStatusOrTimeInfo({ dateString, status }) {
   const date = new Date(dateString);
@@ -43,11 +44,7 @@ export default function ClientMatchStatusOrTimeInfo({ dateString, status }) {
     }
   } else if (status === 'ongoing') {
     return (
-      <>
-        <div className="spinner-grow spinner-grow-sm text-danger me-2" role="status">
-        </div>
-        <span className="live-text">Live</span>
-      </>
+      <LiveIndicator />
     );
   } else if (status === 'to_be_scheduled') {
     displayText = "TBA";
