@@ -90,7 +90,6 @@ export default async function MatchesPage({ searchParams }) {
                 </Link>
               </li>
             ))}
-
           </ul>
         </nav>
       </div>
