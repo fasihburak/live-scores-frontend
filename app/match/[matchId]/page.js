@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import LikeButton from '../../like-button';
 import { baseUrl } from '../../../config';
 
 function Header({ title }) {

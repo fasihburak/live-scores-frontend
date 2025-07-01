@@ -1,12 +1,17 @@
-body {
+/* body {
     background-color: #e6adad;
 }
 
-.container {
-    background-color: antiquewhite;
-    display: flex;
-    justify-content: center;
+.navbar {
+    background-color: #f8f9fa;
+    padding: 1rem;
 }
+
+.nav-item {
+    margin-left: 14px;
+}
+
+
 
 .team {
     background-color: bisque;
@@ -67,3 +72,47 @@ li {
 .card-header-minute {
     margin-left: auto;
 }
+
+.match-list {
+  display: flex;
+  flex-direction: column;
+  align-items: self-start;
+  padding: 10px;
+}
+
+.spinner-grow {
+    margin-left: 10px;
+}
+
+.list-group-item {
+    width: 580px;
+}
+
+.match-status {
+    margin-left: 40px;
+} */
+
+.competition-link {
+    max-width: 120px;
+}
+
+.sub-nav {
+  background-color: #e3f2fd;
+}
+
+.side-navbar {
+    background-color: #d4e2ec;
+}
+
+.top-navbar {
+    background-color: #bdcbd4;
+}
+
+.match-item:hover {
+  background-color: #bac8d6; /* Customize the color as needed */
+}
+
+.match-list {
+    width: 50%;
+    min-width: 450px;
+}   
