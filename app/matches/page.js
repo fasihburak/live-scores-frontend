@@ -3,6 +3,7 @@ import { fetchCompetitions } from '../../lib/fetchCompetitions';
 import { baseUrl } from '../../config';
 import MatchListItem from '../../components/MatchListItem';
 import StatusList from '../../components/StatusList';
+import MatchPaginator from '../../components/MatchPaginator';
 
 async function fetchMatches(competition, status, match_date_gt, match_date_lt, page = 1) {
   const queryParams = [];
@@ -71,27 +72,17 @@ export default async function MatchesPage({ searchParams }) {
       <div className="match-list align-self-start">
         <div>
             <h1 className='ms-3'>{headerText}</h1>
-            <ul className="list-group list-group-flush">
-              {matches.map(match => (
-                <MatchListItem key={match.id} match={match} />
-              ))}
-            </ul>
+            {matches.length > 0 ? (
+              <ul className="list-group list-group-flush">
+                {matches.map(match => (
+                  <MatchListItem key={match.id} match={match} />
+                ))}
+              </ul>
+            ) : (
+              <p className="text-center text-muted">No matches found.</p>
+            )}
         </div>
-        <nav>
-          <ul className="pagination justify-content-center">
-
-            {Array.from({ length: totalPages }, (_, i) => (
-              <li key={i + 1} className={`page-item${page === i + 1 ? ' active' : ''}`}>
-                <Link
-                  className="page-link"
-                  href={`/matches?${competitionId ? `competition=${competitionId}&` : ''}${status ? `status=${status}&` : ''}page=${i + 1}`}
-                >
-                  {i + 1}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        <MatchPaginator totalPages={totalPages} page={page} competitionId={competitionId} status={status} />
       </div>
     </div>
   );
