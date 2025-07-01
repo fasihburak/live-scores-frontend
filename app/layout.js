@@ -39,7 +39,7 @@ export default function RootLayout({ children }) {
           </div>
         </nav>
         <div className="d-flex">
-          <ul className="side-navbar nav nav-underline flex-column p-3" data-bs-theme="light">
+          <ul className="side-navbar nav nav-underline flex-column p-3 min-vh-100" data-bs-theme="light">
             <CompetitionListServer />
           </ul>
           <div className="flex-grow-1">
