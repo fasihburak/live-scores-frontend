@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { baseUrl } from '../../../config';
+import TeamOnMatchPage from '../../../components/TeamOnMatchPage';
+import MatchInfoOnMatchPage from '../../../components/MatchInfoOnMatchPage';
 
 function Header({ title }) {
   return <h1>{title ? title : 'Default title'}</h1>;
@@ -10,18 +12,10 @@ function Header({ title }) {
 
 function Score({ matchData }) {
   return (
-    <div id='score-board'>
-      <div className="team">
-        <img className='team-logo' src={matchData.first_team.logo} alt={matchData.first_team.name} />
-        <p className='team-name'>{matchData.first_team.name}</p>
-      </div>
-      <div className='score'>
-        {matchData.first_team_goals_scored} - {matchData.second_team_goals_scored}
-      </div>
-      <div className="team">
-        <img className='team-logo' src={matchData.second_team.logo} alt={matchData.second_team.name} />
-        <p className='team-name'>{matchData.second_team.name}</p>
-      </div>
+    <div id='score-board' className='d-flex justify-content-around align-items-center'>
+      <TeamOnMatchPage team={matchData.first_team} />
+      <MatchInfoOnMatchPage matchData={matchData} />
+      <TeamOnMatchPage team={matchData.second_team} />
     </div>
   );
 }
