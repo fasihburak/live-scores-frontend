@@ -11,8 +11,6 @@
     margin-left: 14px;
 }
 
-
-
 .team {
     background-color: bisque;
     display: flex;
@@ -139,4 +137,18 @@ li {
 
 .score-container {
     margin-bottom: 20px;
+}
+
+#score-board {
+    /* background-color: beige; */
+    display: flex;
+    justify-content: space-between;
+    width: 80%;
+}
+
+.events-list {
+    list-style: none;
+    padding-left: 0;
+    margin-left: 0;
+    width: 50%;
 }
