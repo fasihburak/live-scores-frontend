@@ -7,7 +7,7 @@ export default function LikeButton() {
  
   function handleClick() {
     setLikes(likes + 1);
-    fetch('http://localhost:8000/api/matches/')
+    fetch(`${baseUrl}/api/matches/`)
       .then(res => res.json())
       .then(data => console.log(data))
       .catch(err => console.error(err));

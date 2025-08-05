@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { baseUrl } from '../../../config';
+import { baseWSUrl } from '../../../config';
 import { SoccerBallIcon, CardIcon, SubstitutionIcon } from '../../../components/Icons';
 import { fetchAllEvents } from '../../../lib/fetchAllEvents';
 import { Score } from '../../../components/ScoreOnMatchPage';
@@ -131,7 +132,7 @@ export default function Match() {
 
 
     // Establish WebSocket connection
-    const socket = new WebSocket(`ws://localhost:8000/ws/chat/${matchId}/`);
+    const socket = new WebSocket(`${baseWSUrl}/ws/chat/${matchId}/`);
     socket.onmessage = (message) => {
       const messageDict = JSON.parse(message.data);
       console.log('Type of incomingEvent:', typeof messageDict);
