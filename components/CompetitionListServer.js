@@ -5,8 +5,8 @@ import { Suspense } from 'react';
 export default async function CompetitionListServer() {
   const competitions = await fetchCompetitions();
   return (
-    <Suspense>
+    <Suspense fallback={null}>
       <CompetitionListClient competitions={competitions} />
     </Suspense>
   );
-}
+} 
