@@ -4,6 +4,7 @@ import { baseUrl } from '../../config';
 import MatchListItem from '../../components/MatchListItem';
 import StatusList from '../../components/StatusList';
 import MatchPaginator from '../../components/MatchPaginator';
+import { Suspense } from 'react';
 
 async function fetchMatches(competition, status, match_date_gt, match_date_lt, page = 1) {
   const queryParams = [];
