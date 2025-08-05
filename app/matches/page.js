@@ -67,7 +67,9 @@ export default async function MatchesPage({ searchParams }) {
   return (
     <div className="d-flex flex-column align-items-center">
       <div className="container-fluid p-0">
-          <StatusList />
+          <Suspense fallback={null}>
+            <StatusList />
+          </Suspense>
       </div>
       <div className="match-list align-self-start">
         <div>
