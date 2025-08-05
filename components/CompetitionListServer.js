@@ -1,7 +1,12 @@
 import CompetitionListClient from './CompetitionListClient';
 import { fetchCompetitions } from '../lib/fetchCompetitions';
+import { Suspense } from 'react';
 
 export default async function CompetitionListServer() {
   const competitions = await fetchCompetitions();
-  return <CompetitionListClient competitions={competitions} />;
+  return (
+    <Suspense>
+      <CompetitionListClient competitions={competitions} />
+    </Suspense>
+  );
 }
