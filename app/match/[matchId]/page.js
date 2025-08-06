@@ -132,7 +132,7 @@ export default function Match() {
 
 
     // Establish WebSocket connection
-    const socket = new WebSocket(`${baseWSUrl}/ws/chat/${matchId}/`);
+    const socket = new WebSocket(`${baseWSUrl}/ws/in-game-events/${matchId}/`);
     socket.onmessage = (message) => {
       const messageDict = JSON.parse(message.data);
       console.log('Type of incomingEvent:', typeof messageDict);
