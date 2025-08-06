@@ -115,7 +115,7 @@ export default function Match() {
     
 
     // Get events for the match
-    const initialEventsUrl = `${baseUrl}/api/in-match-events/?match=${matchId}`;
+    const initialEventsUrl = `${baseUrl}/api/matches/${matchId}/in-match-events/`;
     fetchAllEvents(initialEventsUrl)
       .then(eventsArray => {
         const eventsDict = eventsArray.reduce((acc, event) => {
@@ -132,7 +132,7 @@ export default function Match() {
 
 
     // Establish WebSocket connection
-    const socket = new WebSocket(`${baseWSUrl}/ws/in-game-events/${matchId}/`);
+    const socket = new WebSocket(`${baseWSUrl}/api/ws/matches/${matchId}/in-match-events/`);
     socket.onmessage = (message) => {
       const messageDict = JSON.parse(message.data);
       console.log('Type of incomingEvent:', typeof messageDict);
